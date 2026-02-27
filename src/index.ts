@@ -1,7 +1,10 @@
 import "dotenv/config";
 
+import fastifySwagger from "@fastify/swagger";
+import fastifySwaggerUI from "@fastify/swagger-ui";
 import Fastify from "fastify";
 import {
+  jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
   ZodTypeProvider,
@@ -14,6 +17,22 @@ const app = Fastify({
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+
+await app.register(fastifySwagger, {
+  openapi: {
+    info: {
+      title: "Gym fit API",
+      description: "API for managing gym fit application",
+      version: "1.0.0",
+    },
+    servers: [],
+  },
+  transform: jsonSchemaTransform,
+});
+
+await app.register(fastifySwaggerUI, {
+  routePrefix: "/docs",
+});
 
 app.withTypeProvider<ZodTypeProvider>().route({
   method: "GET",
